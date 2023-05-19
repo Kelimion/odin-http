@@ -17,7 +17,7 @@
 package http
 
 import "core:net"
-import sync "core:sync/sync2"
+import "core:sync"
 import "core:thread"
 
 Request_Status :: enum {
