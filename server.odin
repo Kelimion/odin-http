@@ -48,8 +48,8 @@ errcode_to_string :: proc(code: Status_Code) -> (err_str: string) {
 }
 
 build_response :: proc(code: Status_Code, headers: []string = nil, msg := "", allocator := context.allocator) -> (resp: string) {
-	b := strings.make_builder(allocator)
-	defer strings.destroy_builder(&b)
+	b := strings.builder_make(allocator)
+	defer strings.builder_destroy(&b)
 
 	err_msg := errcode_to_string(code)
 
@@ -271,8 +271,8 @@ serve_files :: proc(dir_path: string, port: int, allocator := context.allocator)
 
 		#partial switch req.method {
 		case .GET:
-			b := strings.make_builder(allocator)
-			defer strings.destroy_builder(&b)
+			b := strings.builder_make(allocator)
+			defer strings.builder_destroy(&b)
 
 			strings.write_string(&b, req.path)
 			req_path := strings.to_string(b)
