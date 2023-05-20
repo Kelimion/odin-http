@@ -179,8 +179,8 @@ recv_response :: proc(skt: net.TCP_Socket, allocator := context.allocator) -> (r
 	// TODO: Read all the data, then parse it.
 
 	read_buf: [8192]byte = ---
-	incoming := make_builder(0, 8192)
-	defer destroy_builder(&incoming)
+	incoming := builder_make(0, 8192)
+	defer builder_destroy(&incoming)
 	for {
 		n, read_err := net.recv(skt, read_buf[:])
 		if read_err != nil do return
@@ -237,8 +237,8 @@ recv_response :: proc(skt: net.TCP_Socket, allocator := context.allocator) -> (r
 		return
 	}
 
-	body_buf := make_builder(0, 8192)
-	defer if !ok do destroy_builder(&body_buf)
+	body_buf := builder_make(0, 8192)
+	defer if !ok do builder_destroy(&body_buf)
 
 	explicit_encoding, _ := resp.headers["Transfer-Encoding"] // NOTE(tetra): error ignored because it'll be the empty string if there was one
 	switch {
@@ -349,8 +349,8 @@ execute_request :: proc(r: Request, max_redirects := ODIN_HTTP_MAX_REDIRECTS, al
 request_to_bytes :: proc(r: Request, allocator := context.allocator) -> []byte {
 	using strings
 
-	b := make_builder(allocator)
-	grow_builder(&b, 8192)
+	b := builder_make(allocator)
+	builder_grow(&b, 8192)
 	if b.buf == nil do return nil
 
 	assert(r.method == .GET, "only GET requests are supported at this time")
@@ -359,7 +359,7 @@ request_to_bytes :: proc(r: Request, allocator := context.allocator) -> []byte {
 	write_string(&b, r.path)
 
 	if r.queries != nil {
-		write_rune_builder(&b, '?')
+		write_rune(&b, '?')
 		for query_name, query_value in r.queries {
 			write_string(&b, query_name)
 			if query_value != "" {
